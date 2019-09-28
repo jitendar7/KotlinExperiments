@@ -38,8 +38,9 @@ fun main(args: Array<String>){
         }
 
     //with multiple arguments
-    val testFunction3: (String, Int) -> String =
-        {name, data ->           //notice the 'it' argument changed to 'name' explicitly
+    val testFunction3: (String, Int) -> String =    // explicit type definition i.e. (String, Int) -> String
+        {name, data ->           //notice the 'it' is no longer valid , we need to mention the arguments explicitly, in this case
+                                 // it is 'name', 'data'
             "Welcome $name $data times"
         }
 
@@ -51,7 +52,7 @@ fun main(args: Array<String>){
     //  no explicit type definition is needed
     // i.e.
 
-    val testFunction4 = {
+    val testFunction4 = {           //no explicit type definition
         "Hello World"
     }
 
