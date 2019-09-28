@@ -8,7 +8,7 @@ class LootBox<T : Loot>(vararg item: T) {  //notice the class name has <T> defin
     //also notice that <T: Loot> will allow only classes which extend Loot class
     var open = false
 
-    private var loot: Array<out T> = item   //notice the <out T> defined
+    private var loot: Array<out T> = item   //notice the <out T> defined, vararg effect
 
     //generic function
     fun fetch(item: Int): T? {
@@ -32,12 +32,12 @@ class Fedora(val name: String, value: Int) : Loot(value)
 class Coin(value: Int) : Loot(value)
 
 
-//producer, consumer geric types
+//producer, consumer generic types
 //producer => readable (out) => defined as 'val' , eg: Lists are producers
 //consumer => writable (in)
 class Barrel1<out T>(val item: T) // notice that 'out', 'val' , producer
 
-class Barrel2<in T>(item: T)        //notice that 'in', NO 'val'/'var' , consumer
+class Barrel2<in T>(item: T)      //notice that 'in', NO 'val'/'var' , consumer
 
 
 inline fun <reified T>       // 'reified' keyword used for preserving type information at runtime
