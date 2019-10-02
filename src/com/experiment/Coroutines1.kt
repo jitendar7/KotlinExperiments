@@ -22,10 +22,10 @@ fun main() {
     }
 
     println("Hello")
-    //runBlocking{   // blocks the main thread
-    //    delay(1500L)     //delay( -> non-blocking
-    //}
+    runBlocking{   // blocks the main thread
+        delay(50L)     //delay( -> non-blocking
+    }
 
-    Thread.sleep(2000L)     //Thread.sleep( -> blocking
+    Thread.sleep(10L)     //Thread.sleep( -> blocking
 
 }
