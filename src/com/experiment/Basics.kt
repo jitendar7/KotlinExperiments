@@ -18,8 +18,8 @@ fun main() {
         .fold(0.toBigDecimal()) { acc, element -> element + acc }
     )
 
-    println(input
+   /* println(input
         .map { it.toDouble() }
         .fold(0.0) { acc, element -> round2(element + acc).toDouble() }
-    )
+    )*/
 }
