@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 
 fun main() = runBlocking {    //this: CoroutineScope
     launch {            //launch a new Coroutine in the scope of runBlocking
-        delay(9000L)
+        delay(2000L)
         println("Task from runBlocking ")
     }
 

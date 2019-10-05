@@ -1,16 +1,22 @@
 package com.experiment
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
+
+//https://medium.com/@elizarov/the-reason-to-avoid-globalscope-835337445abc
 
 suspend fun work(i: Int) = withContext(Dispatchers.Default) {
     //note 'suspend' function, defined withContext
     Thread.sleep(1000)
+    delay(1)
     println("Work $i done")
 }
+
+//GlobalScope.launch creates global coroutines, its developers responsibility to keep track
+// of their lifetime
+
+//launch(Dispatchers.Default) creates 'children' coroutines in 'runBlocking' scope,
+//so 'runBlocking' waits for their completion automatically
 
 fun main() {
     var time = measureTimeMillis {
