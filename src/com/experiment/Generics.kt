@@ -39,6 +39,18 @@ class Barrel1<out T>(val item: T) // notice that 'out', 'val' , producer
 
 class Barrel2<in T>(item: T)      //notice that 'in', NO 'val'/'var' , consumer
 
+//'out' keyword says that methods in a 'List' can only return type 'E' and they cannot take any 'E' type as an argument
+// 'extends => out'
+
+// interface List<out E> {
+//  fun get(index: Int): E
+// }
+
+// 'in' keyword says that all methods in side the class can have 'T' as an argument but cannot return 'T' type
+// interface Compare<in T> {
+//  fun compare(first: T, second: T): Int
+// }
+
 
 inline fun <reified T>       // 'reified' keyword used for preserving type information at runtime
         randomOrBackupLoot(backupLoot: () -> T): T {
