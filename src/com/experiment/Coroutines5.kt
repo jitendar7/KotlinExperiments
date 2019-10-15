@@ -5,7 +5,7 @@ import kotlin.system.measureTimeMillis
 
 //https://medium.com/@elizarov/the-reason-to-avoid-globalscope-835337445abc
 
-suspend fun work(i: Int) = withContext(Dispatchers.Default) {
+suspend fun work(i: Int) = withContext(Dispatchers.Default) {   //concurrency by using 'Dispatchers.Default'
     //note 'suspend' function, defined withContext
     Thread.sleep(1000)
     delay(1)
