@@ -3,8 +3,8 @@ package com.experiment
 import java.io.File
 
 //Working with Standard Functions - (similarities)
-// run , apply
-// with, run
+// apply, run
+// run, with
 // let , also
 // takeIf, takeUnless
 
@@ -28,18 +28,6 @@ fun main() {
         setExecutable(false)
     }
 
-    // "let" - scopes a variable to the lambda provided, & returns the last statement
-    // 'it' is readonly variable
-    // Ex:
-    val firstItemSquared = listOf(1, 2, 3).first().let {
-        it * it
-    }
-
-    val guest: String? = "JM"
-    guest?.let {
-        "Welcome $it"
-    }
-
     //"run" - similar to "apply", except that it doesn't return the receiver, it returns a lambda result
     val menuFile2 = File("menu-file.txt")
     val servesDragonBreath = menuFile2.run {
@@ -55,12 +43,23 @@ fun main() {
         .run(::nameIsLong)
         .run(::playerCreateMessage)
 
-
     //"with" is a variant of "run", "with" requires an argument to be accepted as the first parameter
     // rather than calling it on the receiver
 
     val nameTooLong = with("PolarCube") {
         length > 20
+    }
+
+    // "let" - scopes a variable to the lambda provided, & returns the last statement
+    // 'it' is readonly variable
+    // Ex:
+    val firstItemSquared = listOf(1, 2, 3).first().let {
+        it * it
+    }
+
+    val guest: String? = "JM"
+    guest?.let {
+        "Welcome $it"
     }
 
     //"also" works very similar to the "let" function,
