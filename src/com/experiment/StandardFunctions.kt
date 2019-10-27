@@ -71,7 +71,6 @@ fun main() {
         fileConstants = it.readLines()
     }
 
-
     //"takeIf" evaluates a condition provided in a lambda, called a predicate, ( returns either True or False )
     // if the condition evaluates to true, the 'receiver' is returned or 'null' if false
     val file = File("myFile.txt")
