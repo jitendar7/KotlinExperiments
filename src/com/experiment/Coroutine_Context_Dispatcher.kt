@@ -35,6 +35,13 @@ fun main() = runBlocking<Unit> {
 
     jumpingThreads()
     childrenCoroutine()
+    coroutineNameSample()
+    explicitContextElement()
+
+    val activity = Activity()
+    activity.doSomething()
+
+    contextSwitching()
 }
 
 
@@ -134,5 +141,101 @@ main: Who has survived request cancellation?
 //Parent coroutine always waits for completion of all its children.
 
 //Naming Coroutines for debugging
+// 'CoroutineName' serves the same purpose as thread name
+
+fun coroutineNameSample() = runBlocking(CoroutineName("main")) {
+    //sampleStart
+    log("Started main coroutine")
+    // run two background value computations
+    val v1 = async(CoroutineName("v1coroutine")) {
+        delay(500)
+        log("Computing v1")
+        252
+    }
+    val v2 = async(CoroutineName("v2coroutine")) {
+        delay(1000)
+        log("Computing v2")
+        6
+    }
+    log("The answer for v1 / v2 = ${v1.await() / v2.await()}")
+//sampleEnd
+}
+
+/*
+[main @main#1] Started main coroutine
+[main @v1coroutine#2] Computing v1
+[main @v2coroutine#3] Computing v2
+[main @main#1] The answer for v1 / v2 = 42
+*/
 
 
+//Combining context elements
+fun explicitContextElement() = runBlocking<Unit> {
+    //sampleStart
+    launch(Dispatchers.Default + CoroutineName("test")) {
+        println("I'm working in thread ${Thread.currentThread().name}")
+    }
+//sampleEnd
+}
+
+
+//Managing lifecycles of our coroutines by creating an instance of 'CoroutineScope'
+
+// CoroutineScope() => general purpose scope
+// MainScope() => scope for UI applications & uses 'Dispatcher.Main' as default dispatcher
+
+class Activity : CoroutineScope by CoroutineScope(Dispatchers.Default){
+    private val mainScope = MainScope()
+
+    fun destroy() {
+        mainScope.cancel()
+    }
+
+// instead of defining 'mainscope' as an instance,
+// alternatively, u can implement 'CoroutineScope' interface in this 'Activity' class
+
+//class Activity: CoroutineScope by CoroutineScope(Dispatchers.Default)
+// Now we can launch coroutines in the scope of this 'Activity' without having to specify the context
+
+    //inside the activity class
+// class Activity continues
+    fun doSomething() {
+        // launch ten coroutines for a demo, each working for a different time
+        repeat(10) { i ->
+            launch{
+                delay((i + 1) * 200L) // variable delay 200ms, 400ms, ... etc
+                println("Coroutine $i is done")
+            }
+        }
+    }
+}
+
+
+// passing data between coroutines, using threadlocal
+// using 'asContextElement' extension function is here for the rescue,
+
+val threadLocal = ThreadLocal<String?>() // declare thread-local variable
+
+fun contextSwitching() = runBlocking<Unit> {
+    //sampleStart
+    threadLocal.set("main")
+    println("Pre-main, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+    val job = launch(Dispatchers.Default + threadLocal.asContextElement(value = "launch")) {
+        println("Launch start, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+        yield()
+        println("After yield, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+    }
+    job.join()
+    println("Post-main, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+//sampleEnd
+}
+
+
+/*
+
+Pre-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'
+Launch start, current thread: Thread[DefaultDispatcher-worker-1 @coroutine#2,5,main], thread local value: 'launch'
+After yield, current thread: Thread[DefaultDispatcher-worker-2 @coroutine#2,5,main], thread local value: 'launch'
+Post-main, current thread: Thread[main @coroutine#1,5,main], thread local value: 'main'
+
+*/
