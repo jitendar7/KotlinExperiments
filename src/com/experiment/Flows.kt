@@ -1,9 +1,7 @@
 package com.experiment
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -29,6 +27,8 @@ fun main() = runBlocking<Unit>{
 
     //Collect the flow
     foo().collect{value -> println(value)}
+    cold_flow()
+    main_intermediate_flow_of_operators()
 }
 
 /*
@@ -39,3 +39,57 @@ fun main() = runBlocking<Unit>{
     5. Values are collected from the flow using 'collect' function
 
  */
+
+// Flows are 'cold' streams, similar to sequences - the code inside the flow is not run until the flow is collected.
+fun cold_flow() = runBlocking {
+    println("Calling foo...")
+    val flow = foo()
+    println("Calling collect...")
+    flow.collect { value -> println(value) }
+    println("Calling collect again...")
+    flow.collect { value -> println(value) }
+}
+
+/*
+    Calling foo...
+    Calling collect...
+    Flow started
+    1
+    2
+    3
+    Calling collect again...
+    Flow started
+    1
+    2
+    3
+*/
+
+// Flow adheres to the general cooperative cancellation of coroutines - flow collection can be cancelled when the flow is
+// suspended in a cancellable suspending functions and cannot be cancelled otherwise.
+
+// Other builders of flow are
+// 'flowOf' flow emitting a fixed set of values
+// various collections & sequences can be converted to flows using .asFlow()
+
+// Example: (1..3).asFlow().collect { value -> println(value) }
+
+//Intermediate flow operators
+//Flows can be transformed with operators, just as you would with collections & sequences
+// Intermediate operators are applied to an upstream flow & return a downstream flow
+
+// The difference to sequences is that blocks of code inside these operators can call suspending functions.
+
+
+suspend fun performRequest(request: Int): String {
+    delay(1000) // imitate long-running asynchronous work
+    return "response $request"
+}
+
+fun main_intermediate_flow_of_operators() = runBlocking<Unit> {
+    (1..3).asFlow() // a flow of requests
+        .map { request -> performRequest(request) }
+        .collect { response -> println(response) }      // 'cold'
+}
+
+
+
