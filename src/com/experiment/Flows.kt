@@ -1,5 +1,6 @@
 package com.experiment
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -139,3 +140,104 @@ fun main_take() = runBlocking{
 //1
 //2
 //Finally in numbers
+
+
+//Terminal flow operators
+// These are suspending functions, that start a collection of the flow, 'collect' operator is the most
+// basic one, like , 'toList', 'toSet',
+//                  operators to get the 'first' value and to ensure that a flow emits a 'single' value
+//                  reducing a flow to value with 'reduce' and 'fold'
+
+//  val sum = (1..5).asFlow()
+//        .map { it * it } // squares of numbers from 1 to 5
+//        .reduce { a, b -> a + b } // sum them (terminal operator)
+
+
+//Flows are sequential
+
+fun main_sequential() = runBlocking<Unit> {
+    //sampleStart
+    (1..5).asFlow()
+        .filter {
+            println("Filter $it")
+            it % 2 == 0
+        }
+        .map {
+            println("Map $it")
+            "string $it"
+        }.collect {
+            println("Collect $it")
+        }
+//sampleEnd
+}
+
+
+//Filter 1
+//Filter 2
+//Map 2
+//Collect string 2
+//Filter 3
+//Filter 4
+//Map 4
+//Collect string 4
+//Filter 5
+
+
+//Flow context
+// Collection of flow always happen in the context of the calling coroutine, called context preservation
+
+
+/*
+
+withContext(context) {
+    foo.collect { value ->
+        println(value) // run in the specified context
+    }
+
+}*/
+
+//By default, code in flow{ } builder runs in the context that is provided by a collector of the corresponding flow
+
+//fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
+//
+//fun foo(): Flow<Int> = flow {
+//    log("Started foo flow")
+//    for (i in 1..3) {
+//        emit(i)
+//    }
+//}
+//
+//fun main() = runBlocking<Unit> {
+//    foo().collect { value -> log("Collected $value") }
+//}
+
+
+//[main @coroutine#1] Started foo flow
+//[main @coroutine#1] Collected 1
+//[main @coroutine#1] Collected 2
+//[main @coroutine#1] Collected 3
+
+
+//since the foo().collect is called in the main thread, the body of foo 's flow is also called in the main thread
+
+
+//correct way of switching the context for flows using 'flowOn'
+
+//sampleStart
+fun flow_foo(): Flow<Int> = flow {
+    for (i in 1..3) {
+        Thread.sleep(100) // pretend we are computing it in CPU-consuming way
+        log("Emitting $i")
+        emit(i) // emit next value
+    }
+}.flowOn(Dispatchers.Default) // RIGHT way to change context for CPU-consuming code in flow builder
+    // this also changes sequential behavior
+
+fun main_flowOn() = runBlocking<Unit> {
+    flow_foo().collect { value ->
+        log("Collected $value")
+    }
+}
+
+// here the collection happens in one coroutine & emission happens in another coroutine
+
