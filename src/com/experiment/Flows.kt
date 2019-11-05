@@ -79,7 +79,6 @@ fun cold_flow() = runBlocking {
 
 // The difference to sequences is that blocks of code inside these operators can call suspending functions.
 
-
 suspend fun performRequest(request: Int): String {
     delay(1000) // imitate long-running asynchronous work
     return "response $request"
@@ -92,4 +91,51 @@ fun main_intermediate_flow_of_operators() = runBlocking<Unit> {
 }
 
 
+//Transform operator
+// we can imitate simple transformations like map & filter, as well as more complex transformations.
+// we can 'emit' arbitrary values an arbitrary number of times
+fun main_transform() = runBlocking<Unit> {
+    //sampleStart
+    (1..3).asFlow() // a flow of requests
+            .transform { request ->
+                emit("Making request $request")
+                emit(performRequest(request))
+            }
+            .collect { response -> println(response) }
+//sampleEnd
+}
 
+/*
+Making request 1
+response 1
+Making request 2
+response 2
+Making request 3
+response 3
+*/
+
+//Size-limiting operators
+// 'take' will cancel the execution of the flow when the corresponding limit is reached
+
+
+fun numbers(): Flow<Int> = flow {
+    try{
+        emit(1)
+        emit(2)
+        println("This line will not execute")
+        emit(3)
+
+    } finally {
+        println("Finally in numbers")
+    }
+}
+
+fun main_take() = runBlocking{
+    numbers()
+            .take(2)
+            .collect{value -> println(value)}
+}
+
+//1
+//2
+//Finally in numbers
