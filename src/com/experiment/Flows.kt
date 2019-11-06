@@ -241,3 +241,79 @@ fun main_flowOn() = runBlocking<Unit> {
 
 // here the collection happens in one coroutine & emission happens in another coroutine
 
+
+
+//Buffering - > run emitting code concurrently with collecting code, as opposed to running them sequentially:
+
+//fun foo(): Flow<Int> = flow {
+//    for (i in 1..3) {
+//        delay(100) // pretend we are asynchronously waiting 100 ms
+//        emit(i) // emit next value
+//    }
+//}
+//
+//fun main() = runBlocking<Unit> {
+//    val time = measureTimeMillis {
+//        foo()
+//            .buffer() // buffer emissions, don't wait
+//            .collect { value ->
+//                delay(300) // pretend we are processing it for 300 ms
+//                println(value)
+//            }
+//    }
+//    println("Collected in $time ms")
+//}
+
+
+//1
+//2
+//3
+//Collected in 1071 ms
+
+
+//Conflation -> can be used to skip intermediate values when a collector is too slow to process them.
+
+//val time = measureTimeMillis {
+//        foo()
+//            .conflate() // conflate emissions, don't process each one
+//            .collect { value ->
+//                delay(300) // pretend we are processing it for 300 ms
+//                println(value)
+//            }
+//    }
+
+//here second number was conflated and only the most recent one was delivered to the collector
+
+//1
+//3
+//Collected in 758 ms
+
+
+// processing the latest value using xxxLatest
+
+//val time = measureTimeMillis {
+//        foo()
+//            .collectLatest { value -> // cancel & restart on the latest value
+//                println("Collecting $value")
+//                delay(300) // pretend we are processing it for 300 ms
+//                println("Done $value")
+//            }
+//    }
+
+//Collecting 1
+//Collecting 2
+//Collecting 3
+//Done 3
+//Collected in 741 ms
+
+
+//Composing Multiple flows
+
+//    val nums = (1..3).asFlow() // numbers 1..3
+//    val strs = flowOf("one", "two", "three") // strings
+//    nums.zip(strs) { a, b -> "$a -> $b" } // compose a single string
+//        .collect { println(it) } // collect and print
+
+//1 -> one
+//2 -> two
+//3 -> three
