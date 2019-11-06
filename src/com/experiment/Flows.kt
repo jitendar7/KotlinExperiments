@@ -317,3 +317,87 @@ fun main_flowOn() = runBlocking<Unit> {
 //1 -> one
 //2 -> two
 //3 -> three
+
+
+//Combine
+// It might be needed to compute whenever any upstream flows emit a value
+// The corresponding family of operators is called 'combine'
+
+//For example, if the numbers in the previous example update every 300ms,
+// but strings update every 400 ms, then zipping them using the zip operator will still produce the same result,
+// albeit results that are printed every 400 ms
+
+//    val nums = (1..3).asFlow().onEach { delay(300) } // numbers 1..3 every 300 ms
+//    val strs = flowOf("one", "two", "three").onEach { delay(400) } // strings every 400 ms
+//    val startTime = System.currentTimeMillis() // remember the start time
+//    nums.combine(strs) { a, b -> "$a -> $b" } // compose a single string with "combine"
+//        .collect { value -> // collect and print
+//            println("$value at ${System.currentTimeMillis() - startTime} ms from start")
+//        }
+
+
+//1 -> one at 452 ms from start
+//2 -> one at 651 ms from start
+//2 -> two at 854 ms from start
+//3 -> two at 952 ms from start
+//3 -> three at 1256 ms from start
+
+
+//Flattening flows
+// Situation => each value triggers a request for another sequence of values
+
+//fun requestFlow(i: Int): Flow<String> = flow {
+//    emit("$i: First")
+//    delay(500) // wait 500 ms
+//    emit("$i: Second")
+//}
+
+//(1..3).asFlow().map { requestFlow(it) }
+
+
+//flatmapConcat => they wait for the inner flow to complete before starting to collect the next one
+
+//(1..3).asFlow().onEach { delay(100) } // a number every 100 ms
+//        .flatMapConcat { requestFlow(it) }
+//        .collect { value -> // collect and print
+//            println("$value at ${System.currentTimeMillis() - startTime} ms from start")
+//        }
+
+
+//1: First at 121 ms from start
+//1: Second at 622 ms from start
+//2: First at 727 ms from start
+//2: Second at 1227 ms from start
+//3: First at 1328 ms from start
+//3: Second at 1829 ms from start
+
+
+//flatMapMerge => concurrently collect all the incoming flows and merge their values into a single flow
+
+//(1..3).asFlow().onEach { delay(100) } // a number every 100 ms
+//        .flatMapMerge { requestFlow(it) }
+//        .collect { value -> // collect and print
+//            println("$value at ${System.currentTimeMillis() - startTime} ms from start")
+//        }
+
+//1: First at 136 ms from start
+//2: First at 231 ms from start
+//3: First at 333 ms from start
+//1: Second at 639 ms from start
+//2: Second at 732 ms from start
+//3: Second at 833 ms from start
+
+
+//flatMapLatest => collection of previous flow is cancelled as soon as new flow is emitted.
+
+//(1..3).asFlow().onEach { delay(100) } // a number every 100 ms
+//        .flatMapLatest { requestFlow(it) }
+//        .collect { value -> // collect and print
+//            println("$value at ${System.currentTimeMillis() - startTime} ms from start")
+//        }
+
+
+//1: First at 142 ms from start
+//2: First at 322 ms from start
+//3: First at 425 ms from start
+//3: Second at 931 ms from start
