@@ -401,3 +401,23 @@ fun main_flowOn() = runBlocking<Unit> {
 //2: First at 322 ms from start
 //3: First at 425 ms from start
 //3: Second at 931 ms from start
+
+
+//Flow Exceptions:
+//Ref: https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/flow.md#flow-exceptions
+// try -> catch, everything is caught ( at all stages, emitter, intermediate, terminal operators )
+
+//try {
+//        foo().collect { value ->
+//            println(value)
+//            check(value <= 1) { "Collected $value" }
+//        }
+//    } catch (e: Throwable) {
+//        println("Caught $e")
+//    }
+
+//Exception Transparency
+//emitter can use 'catch' operator that preserves this exception transparency
+
+// 'onEach' moving the body of 'collect' operator
+
