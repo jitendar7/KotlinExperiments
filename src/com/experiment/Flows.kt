@@ -421,3 +421,57 @@ fun main_flowOn() = runBlocking<Unit> {
 
 // 'onEach' moving the body of 'collect' operator
 
+
+//Flow Completion
+// 1. Imperative finally block
+// 2. Declarative handling  -> 'onCompletion' intermediate operator
+
+//foo()
+//  .onCompletion{ cause -> if(cause!=null) println("Flow completed exceptionally") }
+//  .catch{ cause -> println("Caught exception") }
+//  .collect { value -> println(value) }
+
+
+//1
+//Flow completed exceptionally
+//Caught exception
+
+//only upstream exceptions
+
+// foo()
+//        .onCompletion { cause -> println("Flow completed with $cause") }
+//        .collect { value ->
+//            check(value <= 1) { "Collected $value" }
+//            println(value)
+
+//1
+//Flow completed with null
+//Exception in thread "main" java.lang.IllegalStateException: Collected 2
+
+
+//If we use the 'collect' terminal operator after onEach, then the code after it will wait until the flow is collected
+
+//events()
+//    .onEach { event -> println("Event: $event") }
+//    .collect() // <--- Collecting the flow waits
+//    println("Done")
+
+//Event: 1
+//Event: 2
+//Event: 3
+//Done
+
+//events()
+//        .onEach { event -> println("Event: $event") }
+//        .launchIn(this) // <--- Launching the flow in a separate coroutine
+//    println("Done")
+
+//Done
+//Event: 1
+//Event: 2
+//Event: 3
+
+//launchIn also returns a Job, which can be used to cancel the corresponding flow collection coroutine
+// or join it
+
+//Flow is a reactive stream, it is possible to convert to reactive Publisher & vice versa
