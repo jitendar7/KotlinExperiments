@@ -1,5 +1,7 @@
 package com.experiment
 
+//Ref: https://android.jlelse.eu/daily-kotlin-static-methods-9330552cde8a
+
 const val yellow = "Aiasdk"
 
 class Game {
@@ -34,6 +36,9 @@ class Foo {
 
 //Main Function
 fun main(args: Array<String>) {
+
+    val game:Game = Game()
+
 
     //object call
     GameFactory.makeGame()

@@ -15,7 +15,7 @@ fun main(args: Array<String>){
     println(
         {
             val test = "World"
-            "Hello $test"
+            "Hello print $test"
         }()
     )
 
@@ -27,8 +27,8 @@ fun main(args: Array<String>){
             "Hello $test"   //Implicit return
         }
 
-    println(testFunction)
-    println(testFunction())
+    println("testFunction => "+testFunction)
+    println("testFunction() =>"+testFunction())
 
     //Anonymous function with arguments
 
