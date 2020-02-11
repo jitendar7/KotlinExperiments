@@ -12,17 +12,18 @@ package com.experiment
 //3. "Combines" takes difference collections and merge them into a new one.
 // 'zip' , 'fold'
 
-val animals = listOf("zebra", "giraffi", "elephant", "rat")
+val animals = listOf("zebra", "giraffi", "elephant")
 
 fun main() {
 
     val babies = animals.map { animal -> "A baby $animal" }
     println(babies)
+    println(animals)
 
     //flatmap works with collection of collections
     println(listOf(listOf(1, 2, 4), listOf(6, 7, 8)).flatMap { it })
 
-    val itemsOfManyColors = listOf("red apple", "green apple", "red fish", "pink elephant")
+    val itemsOfManyColors = listOf("red apple", "green apple", "red fish", "pink elephant","rack")
     println(itemsOfManyColors.filter { it.contains("red") })
 
     //'zip' combines two collections and merge them
