@@ -1,7 +1,7 @@
 package com.experiment
 
 //Generics
-
+//Ref; https://kotlinlang.org/docs/reference/generics.html
 
 //Generic type
 class LootBox<T : Loot>(vararg item: T) {  //notice the class name has <T> defined, otherwise it's a compilation error
